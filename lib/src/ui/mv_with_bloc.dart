@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_patterns/network_repo/network_repository.dart';
 import 'package:flutter_patterns/src/models/mv_list_obj.dart';
 import 'package:flutter_patterns/src/patterns/simple_bloc.dart';
 import 'package:flutter_patterns/src/widgets/mv_grid_item.dart';
+import 'package:flutter_patterns/utils/api_response.dart';
 import 'package:flutter_patterns/utils/url.dart';
 
 class MvWithBloc extends StatefulWidget {
@@ -13,14 +13,11 @@ class MvWithBloc extends StatefulWidget {
 }
 
 class _MvWithBlocState extends State<MvWithBloc> {
-  NetworkRepository repo = NetworkRepository();
-
   SimpleBloc spBl = SimpleBloc();
 
   @override
   void initState() {
     super.initState();
-
     spBl.getMv('now_playing', {'api_key': API_KEY, "page": "1", "language": "en-US"});
   }
 
@@ -28,19 +25,22 @@ class _MvWithBlocState extends State<MvWithBloc> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Now Playing')),
-      body: StreamBuilder<List<MvResults>?>(
+      body: StreamBuilder<SnapshotResponse>(
         stream: spBl.mvStream(),
+        initialData: SnapshotResponse(data: null),
         builder: (context, snapshot) {
-          if (snapshot.hasData) {
+          SnapshotResponse snap = snapshot.data!;
+          if (snap.hasData) {
+            List<MvResults> mvList = snap.data;
             return GridView.count(
               crossAxisCount: 2,
               mainAxisSpacing: 4,
               childAspectRatio: 70 / 130,
-              children: snapshot.data!.map((e) => MvGridItem(e)).toList(),
+              children: mvList.map((e) => MvGridItem(e)).toList(),
             );
-          } else if (snapshot.hasError) {
+          } else if (snap.hasError) {
             return Center(
-              child: Text(snapshot.error.toString()),
+              child: Text(snap.error.toString()),
             );
           } else {
             return Center(child: CircularProgressIndicator());
@@ -48,5 +48,11 @@ class _MvWithBlocState extends State<MvWithBloc> {
         },
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    spBl.dispose();
+    super.dispose();
   }
 }
