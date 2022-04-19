@@ -23,30 +23,27 @@ class _MvWithBlocState extends State<MvWithBloc> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text('Now Playing')),
-      body: StreamBuilder<SnapshotResponse>(
-        stream: spBl.mvStream(),
-        initialData: SnapshotResponse(data: null),
-        builder: (context, snapshot) {
-          SnapshotResponse snap = snapshot.data!;
-          if (snap.hasData) {
-            List<MvResults> mvList = snap.data;
-            return GridView.count(
-              crossAxisCount: 2,
-              mainAxisSpacing: 4,
-              childAspectRatio: 70 / 130,
-              children: mvList.map((e) => MvGridItem(e)).toList(),
-            );
-          } else if (snap.hasError) {
-            return Center(
-              child: Text(snap.error.toString()),
-            );
-          } else {
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
+    return StreamBuilder<SnapshotResponse>(
+      stream: spBl.mvStream(),
+      initialData: SnapshotResponse(data: null),
+      builder: (context, snapshot) {
+        SnapshotResponse snap = snapshot.data!;
+        if (snap.hasData) {
+          List<MvResults> mvList = snap.data;
+          return GridView.count(
+            crossAxisCount: 2,
+            mainAxisSpacing: 4,
+            childAspectRatio: 70 / 130,
+            children: mvList.map((e) => MvGridItem(e)).toList(),
+          );
+        } else if (snap.hasError) {
+          return Center(
+            child: Text(snap.error.toString()),
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
+      },
     );
   }
 

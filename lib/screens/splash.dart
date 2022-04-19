@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_patterns/root.dart';
 import 'package:flutter_patterns/src/ui/mv_with_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -17,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
       Duration(seconds: 2),
       () => Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(builder: (context) {
-        return MvWithBloc();
+        return RootPage();
       }), (route) => false),
     );
   }
