@@ -14,17 +14,16 @@ class SimpleBloc extends NetworkRepository {
   SnapshotResponse snap = SnapshotResponse(data: null);
 
   getMv(String url, Map<String, dynamic>? param) async {
-    await mvFetch(url: url, params: param).then((snapshot) {
-      if (snapshot.hasData) {
-        MvListObj mvObj = MvListObj.fromJson(snapshot.data);
-        snapshot.data = mvObj.results;
-        if (!controller.isClosed) {
-          controller.sink.add(snapshot);
-        }
-      } else {
+    SnapshotResponse snapshot = await mvFetch(url: url, params: param);
+    if (snapshot.hasData) {
+      MvListObj mvObj = MvListObj.fromJson(snapshot.data);
+      snapshot.data = mvObj.results;
+      if (!controller.isClosed) {
         controller.sink.add(snapshot);
       }
-    });
+    } else {
+      controller.sink.add(snapshot);
+    }
   }
 
   dispose() {
